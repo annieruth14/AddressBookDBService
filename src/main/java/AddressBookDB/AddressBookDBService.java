@@ -178,4 +178,21 @@ public class AddressBookDBService {
 		}
 		return contact;
 	}
+
+	public List<String> getPersonByCity(String city) throws AddressBookException {
+		List<String> list = new ArrayList<>();
+		String sql = "select p.name from person p natural join adress a where a.city = ? ;";
+		try {
+			Connection connection = getConnection();
+			addressBookDataStatement = connection.prepareStatement(sql);
+			addressBookDataStatement.setString(1, city);
+			ResultSet resultSet = addressBookDataStatement.executeQuery();
+			while (resultSet.next()) {
+				list.add(resultSet.getString(1));
+			}
+		} catch (SQLException e) {
+			throw new AddressBookException(e.getMessage(), AddressBookException.ExceptionType.SQL_EXCEPTION);
+		}
+		return list; 
+	}
 }

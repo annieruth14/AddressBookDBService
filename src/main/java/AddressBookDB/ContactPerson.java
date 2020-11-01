@@ -196,4 +196,10 @@ public class ContactPerson {
 			return true;
 		return false;
 	}
+
+	public List<String> getPersonsFromCity(String city) throws AddressBookException {
+		List<String> list = new ArrayList<>();
+		list = dbService.getPersonByCity(city);
+		return list;
+	}
 }
