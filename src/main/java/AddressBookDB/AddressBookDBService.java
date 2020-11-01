@@ -1,6 +1,7 @@
 package AddressBookDB;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -85,5 +86,96 @@ public class AddressBookDBService {
 			throw new AddressBookException(e.getMessage(), AddressBookException.ExceptionType.SQL_EXCEPTION);
 		}
 		return list;
+	}
+
+	public AddressBook addPersonWithDetails(int bookId, String bookName, String bookType, String firstName, String lastName, long phone, String email, String state, String city, String zip) throws AddressBookException {
+		int personId = -1;
+		Connection connection = null;
+		AddressBook contact = null;
+		
+		// establishing connection
+		try {
+			connection = getConnection();
+			connection.setAutoCommit(false);
+		}
+		catch (SQLException e) {
+			throw new AddressBookException(e.getMessage(), AddressBookException.ExceptionType.SQL_EXCEPTION);
+		}
+		
+		// inserting to first table
+		try (Statement statement = connection.createStatement()) {
+			String sql = String.format("insert into person (book_id, name, phone, email) values (%s, '%s', %s, '%s');", bookId, firstName, phone, email) ;
+			int rowAffected = statement.executeUpdate(sql, statement.RETURN_GENERATED_KEYS);
+			if (rowAffected == 1) {
+				ResultSet resultSet = statement.getGeneratedKeys();
+				if (resultSet.next())
+					personId = resultSet.getInt(1);
+			} 
+		} catch (SQLException e) {
+			try {
+				e.printStackTrace();
+				connection.rollback();
+				return contact;
+			} catch (SQLException e1) {
+				e.printStackTrace();
+				throw new AddressBookException(e.getMessage(), AddressBookException.ExceptionType.SQL_EXCEPTION);
+			}
+		}
+		
+		// inserting into 2nd table
+		try (Statement statement = connection.createStatement()) {
+			String sql = String.format("insert into book (book_id, book_name, type) values (%s, '%s', '%s')", bookId, bookName, bookType);
+			int rowAffected = statement.executeUpdate(sql);
+			if (rowAffected == 0) {
+				return contact;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				e.printStackTrace();
+				throw new AddressBookException(e.getMessage(), AddressBookException.ExceptionType.SQL_EXCEPTION);
+			}
+		}
+		
+		// inserting into third table
+		try (Statement statement = connection.createStatement()) {
+			String sql = String.format("insert into adress (person_id, state, city, zip) values (%s, '%s', '%s', '%s')", personId, city, state, zip);
+			int rowAffected = statement.executeUpdate(sql);
+			if (rowAffected == 1) {
+				contact = new AddressBook(firstName, lastName , city, city, state, Integer.parseInt(zip), phone, email);
+			}
+		} catch (SQLException e) { 
+			e.printStackTrace();
+			try {
+				connection.rollback();
+				return contact;
+			} catch (SQLException e1) {
+				e.printStackTrace();
+				throw new AddressBookException(e.getMessage(), AddressBookException.ExceptionType.SQL_EXCEPTION);
+			}
+		}
+		
+		// for final committing
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new AddressBookException(e.getMessage(), AddressBookException.ExceptionType.SQL_EXCEPTION);
+		}
+		
+		// closing the connection
+		finally {
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					throw new AddressBookException(e.getMessage(), AddressBookException.ExceptionType.SQL_EXCEPTION);
+				}
+			}
+		}
+		return contact;
 	}
 }

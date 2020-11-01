@@ -175,13 +175,25 @@ public class ContactPerson {
 
 	public boolean checkInSync(String name) throws AddressBookException {
 		List<AddressBook> list = dbService.getPerson(name);
+		System.out.println(list.size());
 		AddressBook person = this.getPersonFromList(name);
-		if(person.equals(list.get(0)))
+		System.out.println(person.getFirst_name());
+		if(getPersonFromList(name).equals(list.get(0)))
 			return true;
 		return false;
 	}
 
 	private AddressBook getPersonFromList(String name) {
-		return addressList.stream().filter(n -> n.getFirst_name().equals(name)).findFirst().orElse(null);
+		return addressList.stream()
+				.filter(n -> n.getFirst_name().equals(name))
+				.findFirst()
+				.orElse(null);
+	}
+
+	public boolean addPersonInDB(int bookId, String bookName, String bookType, String firstName, String lastName, long phone, String email, String state, String city, String zip) throws AddressBookException {
+		AddressBook person = dbService.addPersonWithDetails(bookId, bookName, bookType, firstName, lastName, phone, email, state, city, zip);
+		if(person != null)
+			return true;
+		return false;
 	}
 }
