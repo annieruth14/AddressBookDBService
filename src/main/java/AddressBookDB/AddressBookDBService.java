@@ -2,6 +2,7 @@ package AddressBookDB;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AddressBookDBService {
+	
+	private PreparedStatement addressBookDataStatement;
 	
 	private Connection getConnection() throws SQLException {
 		String jdbcURL = "jdbc:mysql://localhost:3306/AddressBookService?useSSL=false";
@@ -51,6 +54,34 @@ public class AddressBookDBService {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw new AddressBookException(e.getMessage(), AddressBookException.ExceptionType.SQL_EXCEPTION);
+		}
+		return list;
+	}
+
+	public int updateData(String name, String address) throws AddressBookException {
+		String sql = "update AddressBook set address = ? where first_name = ? ;";
+		try {
+			Connection connection = getConnection();
+			addressBookDataStatement = connection.prepareStatement(sql);
+			addressBookDataStatement.setString(1, address);
+			addressBookDataStatement.setString(2, name);
+			return addressBookDataStatement.executeUpdate();
+		} catch (SQLException e) {
+			throw new AddressBookException(e.getMessage(), AddressBookException.ExceptionType.SQL_EXCEPTION);
+		}
+	}
+
+	public List<AddressBook> getPerson(String name) throws AddressBookException {
+		List<AddressBook> list = new ArrayList<>();
+		String sql = "Select * from AddressBook where first_name = ?;";
+		try {
+			Connection connection = getConnection();
+			addressBookDataStatement = connection.prepareStatement(sql);
+			addressBookDataStatement.setString(1, name);
+			ResultSet resultSet = addressBookDataStatement.executeQuery();
+			list = getPersonData(resultSet);
+		} catch (SQLException e) {
 			throw new AddressBookException(e.getMessage(), AddressBookException.ExceptionType.SQL_EXCEPTION);
 		}
 		return list;

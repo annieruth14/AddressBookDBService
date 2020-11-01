@@ -9,6 +9,7 @@ import java.util.Map;
 
 public class ContactPerson {
 	public static ContactPerson obj = new ContactPerson();
+	AddressBookDBService dbService = new AddressBookDBService();
 	public static ArrayList<AddressBook> addressList = new ArrayList<AddressBook>();
 	public static Scanner sc = new Scanner(System.in);
 
@@ -157,9 +158,30 @@ public class ContactPerson {
 	}
 	
 	// Retrieving from database
-	public List<AddressBook> getCountFromDB() throws AddressBookException {
+	public List<AddressBook> getListFromDB() throws AddressBookException {
 		AddressBookDBService dbService = new AddressBookDBService();
 		addressList = dbService.getCount();
 		return addressList;
+	}
+
+	public void updateContact(String name, String address) throws AddressBookException {
+		int result = dbService.updateData(name, address);
+		if(result == 1)
+			addressList.stream().forEach(person -> {
+				if(person.getFirst_name().equals(name)) 
+					person.setAddress(address);
+			});
+	}
+
+	public boolean checkInSync(String name) throws AddressBookException {
+		List<AddressBook> list = dbService.getPerson(name);
+		AddressBook person = this.getPersonFromList(name);
+		if(person.equals(list.get(0)))
+			return true;
+		return false;
+	}
+
+	private AddressBook getPersonFromList(String name) {
+		return addressList.stream().filter(n -> n.getFirst_name().equals(name)).findFirst().orElse(null);
 	}
 }
