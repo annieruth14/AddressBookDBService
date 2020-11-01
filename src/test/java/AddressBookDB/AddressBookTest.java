@@ -11,7 +11,16 @@ public class AddressBookTest {
 	@Test 
 	public void givenDatabase_shouldReturnCount() throws AddressBookException {
 		ContactPerson contact = new ContactPerson();
-		List<AddressBook> listOfAddress = contact.getCountFromDB();
+		List<AddressBook> listOfAddress = contact.getListFromDB();
 		Assert.assertEquals(8, listOfAddress.size());
+	}
+	
+	@Test
+	public void givenNewAddress_whenUpdated_shouldSyncWithDatabase() throws AddressBookException {
+		ContactPerson contact = new ContactPerson();
+		List<AddressBook> listOfAddress = contact.getListFromDB();
+		contact.updateContact("Brian", "Siliguri");
+		boolean result = contact.checkInSync("Brian");
+		Assert.assertTrue(result);
 	}
 }
