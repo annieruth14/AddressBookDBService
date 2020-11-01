@@ -4,11 +4,12 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class ContactPerson {
 	public static ContactPerson obj = new ContactPerson();
-	public static ArrayList<AddressBook> list = new ArrayList<AddressBook>();
+	public static ArrayList<AddressBook> addressList = new ArrayList<AddressBook>();
 	public static Scanner sc = new Scanner(System.in);
 
 	public static void main(String[] args) {
@@ -36,7 +37,7 @@ public class ContactPerson {
 		String state = sc.nextLine();
 		int count = 0;
 		HashMap<String, String> stateMap = new HashMap<>();
-		for (AddressBook b : list) {
+		for (AddressBook b : addressList) {
 			if (b.getState().equals(state)) {
 				stateMap.put(b.getFirst_name(), state);
 			}
@@ -54,7 +55,7 @@ public class ContactPerson {
 		String city = sc.nextLine();
 		int count = 0;
 		HashMap<String, String> cityMap = new HashMap<>();
-		for (AddressBook b : list) {
+		for (AddressBook b : addressList) {
 			if (b.getCity().equals(city)) {
 				cityMap.put(b.getFirst_name(), city);
 			}
@@ -89,15 +90,15 @@ public class ContactPerson {
 			System.out.println("Enter the email");
 			String email = sc.nextLine();
 			AddressBook book = new AddressBook(f_name, l_name, address, city, state, zip, ph, email);
-			if (list.contains(book)) {
+			if (addressList.contains(book)) {
 				System.out.println("Name already exists. Hence cannot be added   ");
 			} else
-				list.add(book);
+				addressList.add(book);
 			System.out.println("Do you want to enter more person? (yes/no)  ");
 			answer = sc.nextLine();
 		}
 		System.out.println("The details after adding are :");
-		for (AddressBook p : list) {
+		for (AddressBook p : addressList) {
 			System.out.println(p.getFirst_name() + " " + p.getLast_name() + " " + p.getAddress() + " " + p.getCity()
 					+ " " + p.getState() + " " + p.getZip() + " " + p.getPhone() + " " + p.getEmail());
 		}
@@ -110,7 +111,7 @@ public class ContactPerson {
 		String field = sc.nextLine();
 		System.out.println("Enter the new value");
 		String new_value = sc.nextLine();
-		for (AddressBook b : list) {
+		for (AddressBook b : addressList) {
 			if (name.equalsIgnoreCase(b.getFirst_name())) {
 				if (field.equalsIgnoreCase("address")) {
 					b.setAddress(new_value);
@@ -131,14 +132,14 @@ public class ContactPerson {
 			}
 		}
 		System.out.println("The details after editing are :");
-		for (AddressBook p : list) {
+		for (AddressBook p : addressList) {
 			System.out.println(p.getFirst_name() + " " + p.getLast_name() + " " + p.getAddress() + " " + p.getCity()
 					+ " " + p.getState() + " " + p.getZip() + " " + p.getPhone() + " " + p.getEmail());
 		}
 	}
 
 	public void deleteContact() {
-		Iterator<AddressBook> itr = list.iterator();
+		Iterator<AddressBook> itr = addressList.iterator();
 		System.out.println("Enter name of the person to be deleted");
 		String del_person = sc.nextLine();
 		while (itr.hasNext()) {
@@ -148,10 +149,17 @@ public class ContactPerson {
 			}
 		}
 		System.out.println("The details after deleting are :");
-		for (AddressBook p : list) {
+		for (AddressBook p : addressList) {
 			System.out.println(p.getFirst_name() + " " + p.getLast_name() + " " + p.getAddress() + " " + p.getCity()
 					+ " " + p.getState() + " " + p.getZip() + " " + p.getPhone() + " " + p.getEmail());
 
 		}
+	}
+	
+	// Retrieving from database
+	public List<AddressBook> getCountFromDB() throws AddressBookException {
+		AddressBookDBService dbService = new AddressBookDBService();
+		addressList = dbService.getCount();
+		return addressList;
 	}
 }
