@@ -32,4 +32,12 @@ public class AddressBookTest {
 		boolean result = contact.addPersonInDB(6,"book6","batchmates","Neeraj","Ghosh",9874569362L,"james@gmail.com","Tripura","Agartala","258796");
 		Assert.assertTrue(result);
 	}
+	
+	// retrieve data by city
+	@Test
+	public void givenCity_shouldReturnPersons() throws AddressBookException {
+		ContactPerson contact = new ContactPerson();
+		List<String> listOfPersons = contact.getPersonsFromCity("Bangalore");
+		Assert.assertEquals(3, listOfPersons.size());
+	}
 }
