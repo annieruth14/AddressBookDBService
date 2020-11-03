@@ -202,4 +202,15 @@ public class ContactPerson {
 		list = dbService.getPersonByCity(city);
 		return list;
 	}
+
+	public void addPersonInDB(List<AddressBook> listOfContacts, int bookId, String bookName, String bookType) {
+		listOfContacts.forEach(contact -> {
+			try {
+				addressList.add(contact);
+				this.addPersonInDB(bookId, bookName, bookType, contact.getFirst_name(), contact.getLast_name(), contact.getPhone(), contact.getEmail(), contact.getState(), contact.getCity(), Integer.toString(contact.getZip()));
+			} catch (AddressBookException e) {
+				e.printStackTrace();
+			}
+		});
+	}
 }

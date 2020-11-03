@@ -87,6 +87,23 @@ public class AddressBookDBService {
 		}
 		return list;
 	}
+	
+	public List<String> getBook(int bookId) throws AddressBookException {
+		List<String> list = new ArrayList<>();
+		String sql = "Select book_name from book where book_id = ?;";
+		try {
+			Connection connection = getConnection();
+			addressBookDataStatement = connection.prepareStatement(sql);
+			addressBookDataStatement.setInt(1, bookId);
+			ResultSet resultSet = addressBookDataStatement.executeQuery();
+			while(resultSet.next()) {
+				list.add(resultSet.getString(1));
+			}
+		} catch (SQLException e) {
+			throw new AddressBookException(e.getMessage(), AddressBookException.ExceptionType.SQL_EXCEPTION);
+		}
+		return list;
+	}
 
 	public AddressBook addPersonWithDetails(int bookId, String bookName, String bookType, String firstName, String lastName, long phone, String email, String state, String city, String zip) throws AddressBookException {
 		int personId = -1;
@@ -124,10 +141,14 @@ public class AddressBookDBService {
 		
 		// inserting into 2nd table
 		try (Statement statement = connection.createStatement()) {
-			String sql = String.format("insert into book (book_id, book_name, type) values (%s, '%s', '%s')", bookId, bookName, bookType);
-			int rowAffected = statement.executeUpdate(sql);
-			if (rowAffected == 0) {
-				return contact;
+			List<String> book = new ArrayList<>();
+			book = this.getBook(bookId);
+			if(book.isEmpty()) {
+				String sql = String.format("insert into book (book_id, book_name, type) values (%s, '%s', '%s');", bookId, bookName, bookType);
+				int rowAffected = statement.executeUpdate(sql);
+				if (rowAffected == 0) {
+					return contact;
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
