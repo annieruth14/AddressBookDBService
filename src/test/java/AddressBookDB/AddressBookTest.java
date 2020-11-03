@@ -1,5 +1,9 @@
 package AddressBookDB;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -39,5 +43,20 @@ public class AddressBookTest {
 		ContactPerson contact = new ContactPerson();
 		List<String> listOfPersons = contact.getPersonsFromCity("Bangalore");
 		Assert.assertEquals(3, listOfPersons.size());
+	}
+	
+	// add multiple contacts using threads
+	@Test
+	public void givenMultipleContacts_whenAdded_shouldBeAddedToDatabase() throws AddressBookException {
+		AddressBook[] contacts = {
+				new AddressBook("Sara", "Singh", "Bidhanpally", "Siliguri", "WB", 7894561, 9874563258L, "sara@gmail.com"),
+				new AddressBook("Ashish", "Gopal", "Kadamtala", "Kolkata", "WB", 569856, 874596665L, "ashish@gmail.com"),
+				new AddressBook("Alok", "Singh", "Kormangala", "Bangalore", "Karnataka", 6985554, 9874588774L, "alok@gmail.com")
+		};
+		ContactPerson service = new ContactPerson();
+		Instant start = Instant.now();
+		service.addPersonInDB(Arrays.asList(contacts), 9, "book9", "roommates");
+		Instant end =Instant.now();
+		System.out.println("Duration with thread: "+ Duration.between(start, end));
 	}
 }
