@@ -11,12 +11,12 @@ import org.junit.Test;
 
 public class AddressBookTest {
 	
-	// check number of entries
+	// check number of entries in the person and adress table
 	@Test 
 	public void givenDatabase_shouldReturnCount() throws AddressBookException {
 		ContactPerson contact = new ContactPerson();
 		List<AddressBook> listOfAddress = contact.getListFromDB();
-		Assert.assertEquals(8, listOfAddress.size());
+		Assert.assertEquals(10, listOfAddress.size());
 	}
 	
 	// update data
@@ -24,14 +24,14 @@ public class AddressBookTest {
 	public void givenNewAddress_whenUpdated_shouldSyncWithDatabase() throws AddressBookException {
 		ContactPerson contact = new ContactPerson();
 		List<AddressBook> listOfAddress = contact.getListFromDB();
-		contact.updateContact("Brian", "Siliguri");
+		contact.updateContact("Brian", "brian@microsoft.com");
 		boolean result = contact.checkInSync("Brian");
 		Assert.assertTrue(result);
 	}
 	
 	// add data to table and list
 	@Test
-	public void givenNewAddress_whenMultipleTables_shouldInsertInTheDatabase() throws AddressBookException {
+	public void givenNewAddress_whenInsertingInMultipleTables_shouldInsertInTheDatabase() throws AddressBookException {
 		ContactPerson contact = new ContactPerson();
 		boolean result = contact.addPersonInDB(6,"book6","batchmates","Neeraj","Ghosh",9874569362L,"james@gmail.com","Tripura","Agartala","258796");
 		Assert.assertTrue(result);
@@ -58,5 +58,7 @@ public class AddressBookTest {
 		service.addPersonInDB(Arrays.asList(contacts), 9, "book9", "roommates");
 		Instant end =Instant.now();
 		System.out.println("Duration with thread: "+ Duration.between(start, end));
+		List<AddressBook> listOfAddress = service.getListFromDB();
+		Assert.assertEquals(13, listOfAddress.size());
 	}
 }
