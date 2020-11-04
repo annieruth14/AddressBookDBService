@@ -159,25 +159,24 @@ public class ContactPerson {
 	
 	// Retrieving from database
 	public List<AddressBook> getListFromDB() throws AddressBookException {
-		AddressBookDBService dbService = new AddressBookDBService();
-		addressList = dbService.getCount();
+		addressList = dbService.getDetails();
 		return addressList;
 	}
-
-	public void updateContact(String name, String address) throws AddressBookException {
-		int result = dbService.updateData(name, address);
+	
+	// update contact email when name is given
+	public void updateContact(String name, String email) throws AddressBookException {
+		int result = dbService.updateData(name, email);
 		if(result == 1)
 			addressList.stream().forEach(person -> {
 				if(person.getFirst_name().equals(name)) 
-					person.setAddress(address);
+					person.setEmail(email);
 			});
 	}
-
+	
+	// checks whether database is in sync with list
 	public boolean checkInSync(String name) throws AddressBookException {
 		List<AddressBook> list = dbService.getPerson(name);
-		System.out.println(list.size());
 		AddressBook person = this.getPersonFromList(name);
-		System.out.println(person.getFirst_name());
 		if(getPersonFromList(name).equals(list.get(0)))
 			return true;
 		return false;
